@@ -370,15 +370,6 @@ Testing the complete application
 
 Before finishing, test the main calculator operations and make sure there are no broken buttons, navigation errors, API errors or console errors.
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/14b7209a-497c-5af3-9a80-452b3bbaeff3).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
