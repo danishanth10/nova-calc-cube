@@ -37,13 +37,20 @@ const SCI: KeyDef[] = [
 const BIN_OPS = ["+", "−", "×", "÷", "^"];
 
 export function Calculator({ mode }: { mode: "basic" | "scientific" }) {
-  const { expression, setExpression, addHistory, history, settings, updateSettings, feedback } = useCalc();
+  const { expression, setExpression: setExpr, addHistory, history, settings, updateSettings, feedback } = useCalc();
   const [justEvaluated, setJustEvaluated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const scrollRef = useRef<HTMLDivElement>(null);
   const touchX = useRef<number | null>(null);
   const navigate = useNavigate();
+  // Ref keeps rapid taps from reading a stale expression between renders.
+  const exprRef = useRef(expression);
+  exprRef.current = expression;
+  const evalRef = useRef(justEvaluated);
+  evalRef.current = justEvaluated;
+  const setExpression = useCallback((v: string) => { exprRef.current = v; setExpr(v); }, [setExpr]);
+  const setJust = useCallback((v: boolean) => { evalRef.current = v; setJustEvaluated(v); }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: "smooth" });
@@ -60,7 +67,8 @@ export function Calculator({ mode }: { mode: "basic" | "scientific" }) {
       feedback();
       setError(null);
       const ins = k.insert ?? (k.action ? undefined : k.label);
-      const e = expression;
+      const e = exprRef.current;
+      const justEvaluated = evalRef.current;
       if (ins !== undefined) {
         const isBin = BIN_OPS.includes(ins);
         const isPostfix = ins === "%" || ins === "!" || ins === "^2";
@@ -81,33 +89,33 @@ export function Calculator({ mode }: { mode: "basic" | "scientific" }) {
         } else base = base + ins;
         if (base.length > 200) return setError("Expression is too long");
         setExpression(base);
-        setJustEvaluated(false);
+        setJust(false);
         return;
       }
       switch (k.action) {
         case "clear":
           setExpression("");
-          setJustEvaluated(false);
+          setJust(false);
           return;
         case "back": {
-          if (justEvaluated) { setExpression(""); setJustEvaluated(false); return; }
+          if (justEvaluated) { setExpression(""); setJust(false); return; }
           const m = e.match(/(sin\(|cos\(|tan\(|log\(|ln\(|√\()$/);
           setExpression(m ? e.slice(0, -m[0].length) : e.slice(0, -1));
           return;
         }
         case "negate": {
           const m = e.match(/(\(−)?(\d*\.?\d+(e[+-]?\d+)?)$/);
-          if (!m) { setExpression(e + "(−"); setJustEvaluated(false); return; }
+          if (!m) { setExpression(e + "(−"); setJust(false); return; }
           const start = e.length - m[0].length;
           setExpression(e.slice(0, start) + (m[1] ? m[2] : `(−${m[2]}`));
-          setJustEvaluated(false);
+          setJust(false);
           return;
         }
         case "ans": {
           const last = history[0]?.result;
           if (!last) return setError("No previous answer yet");
           setExpression((justEvaluated ? "" : e) + last);
-          setJustEvaluated(false);
+          setJust(false);
           return;
         }
         case "angle":
@@ -120,12 +128,12 @@ export function Calculator({ mode }: { mode: "basic" | "scientific" }) {
           if (!r.ok) return setError(r.error);
           addHistory(e, r.value);
           setExpression(r.value.replace(/^-/, "−"));
-          setJustEvaluated(true);
+          setJust(true);
           return;
         }
       }
     },
-    [expression, justEvaluated, feedback, setExpression, addHistory, history, settings.angle, updateSettings],
+    [feedback, setExpression, setJust, addHistory, history, settings.angle, updateSettings],
   );
 
   // keyboard support
