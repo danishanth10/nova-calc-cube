@@ -165,7 +165,6 @@ export function Calculator({ mode }: { mode: "basic" | "scientific" }) {
     <div className="tilt-stage flex flex-1 flex-col" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <div
         className="tilt-body glass flex flex-1 flex-col gap-4 rounded-[2rem] p-4"
-        style={{ transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
         onPointerMove={onPointerMove}
         onPointerLeave={() => setTilt({ x: 0, y: 0 })}
       >
@@ -177,7 +176,7 @@ export function Calculator({ mode }: { mode: "basic" | "scientific" }) {
           <span className="font-mono text-[11px] tracking-widest text-muted-foreground">{settings.angle.toUpperCase()}</span>
         </div>
 
-        <div className="display-screen flex min-h-36 flex-col justify-end gap-1 rounded-3xl px-5 py-4" style={{ transform: "translateZ(20px)" }}>
+        <div className="tilt-body display-screen flex min-h-36 flex-col justify-end gap-1 rounded-3xl px-5 py-4" style={{ transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}>
           <div ref={scrollRef} className="no-scrollbar overflow-x-auto whitespace-nowrap text-right" aria-live="polite">
             <span className={cn("font-mono transition-all", justEvaluated ? "text-5xl font-medium" : expression.length > 14 ? "text-2xl" : "text-4xl")}>
               {expression || "0"}
