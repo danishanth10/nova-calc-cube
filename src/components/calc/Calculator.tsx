@@ -139,7 +139,7 @@ export function Calculator({ mode }: { mode: "basic" | "scientific" }) {
     };
     const h = (ev: KeyboardEvent) => {
       if (/^\d$/.test(ev.key)) press({ label: ev.key });
-      else if (map[ev.key]) { ev.preventDefault(); press(map[ev.key]); }
+      else { const k = map[ev.key]; if (k) { ev.preventDefault(); press(k); } }
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
@@ -150,10 +150,10 @@ export function Calculator({ mode }: { mode: "basic" | "scientific" }) {
     const r = ev.currentTarget.getBoundingClientRect();
     setTilt({ x: ((ev.clientY - r.top) / r.height - 0.5) * -4, y: ((ev.clientX - r.left) / r.width - 0.5) * 4 });
   };
-  const onTouchStart = (ev: TouchEvent) => { touchX.current = ev.touches[0].clientX; };
+  const onTouchStart = (ev: TouchEvent) => { touchX.current = ev.touches[0]?.clientX ?? null; };
   const onTouchEnd = (ev: TouchEvent) => {
     if (touchX.current === null) return;
-    const dx = ev.changedTouches[0].clientX - touchX.current;
+    const dx = (ev.changedTouches[0]?.clientX ?? touchX.current) - touchX.current;
     touchX.current = null;
     if (dx < -70 && mode === "basic") navigate({ to: "/scientific" });
     if (dx > 70 && mode === "scientific") navigate({ to: "/" });

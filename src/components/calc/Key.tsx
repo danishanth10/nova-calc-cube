@@ -5,10 +5,10 @@ export type KeyVariant = "num" | "fn" | "op" | "eq" | "clr";
 
 type Props = {
   label: ReactNode;
-  ariaLabel?: string;
-  variant?: KeyVariant;
+  ariaLabel?: string | undefined;
+  variant?: KeyVariant | undefined;
   onPress: () => void;
-  className?: string;
+  className?: string | undefined;
 };
 
 export const Key = memo(function Key({ label, ariaLabel, variant = "num", onPress, className }: Props) {

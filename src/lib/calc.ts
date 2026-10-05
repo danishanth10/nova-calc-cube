@@ -17,15 +17,15 @@ function tokenize(src: string): Tok[] {
   const out: Tok[] = [];
   let i = 0;
   while (i < s.length) {
-    const c = s[i];
+    const c = s.charAt(i);
     if (/[0-9.]/.test(c)) {
       let j = i;
-      while (j < s.length && /[0-9.]/.test(s[j])) j++;
+      while (j < s.length && /[0-9.]/.test(s.charAt(j))) j++;
       // scientific notation from formatted results, e.g. 1.2e+21
       if (s[j] === "e" && /[+\-]?\d/.test(s.slice(j + 1, j + 3))) {
         j++;
         if (s[j] === "+" || s[j] === "-") j++;
-        while (j < s.length && /\d/.test(s[j])) j++;
+        while (j < s.length && /\d/.test(s.charAt(j))) j++;
       }
       const raw = s.slice(i, j);
       if ((raw.match(/\./g) || []).length > 1 && !raw.includes("e")) throw new CalcError("Invalid number");
@@ -46,7 +46,8 @@ function tokenize(src: string): Tok[] {
     if (c === "(") { out.push({ t: "lp" }); i++; continue; }
     if (c === ")") { out.push({ t: "rp" }); i++; continue; }
     const map: Record<string, string> = { "+": "+", "-": "-", "−": "-", "×": "*", "*": "*", "÷": "/", "/": "/", "^": "^", "%": "%", "!": "!" };
-    if (map[c]) { out.push({ t: "op", v: map[c] }); i++; continue; }
+    const mapped = map[c];
+    if (mapped) { out.push({ t: "op", v: mapped }); i++; continue; }
     throw new CalcError(`Unexpected "${c}"`);
   }
   return out;
